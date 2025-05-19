@@ -1,2 +1,1 @@
-web: gunicorn python.MahallaMart.wsgi
-
+web: gunicorn MahallaMart.wsgi:application
