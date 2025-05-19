@@ -1,0 +1,80 @@
+{% extends "base-admin.html" %}
+
+{% block content %}
+
+    <!-- Main content -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Mahsulotlar</h3>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+          <i class="bi bi-plus-circle"></i> Yangi Mahsulot Qo'shish
+        </button>
+      </div>
+
+      <!-- Search / Filter -->
+      <div class="input-group mb-4">
+        <input type="text" class="form-control" placeholder="Mahsulot qidirish...">
+        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+      </div>
+
+      <!-- Products Table -->
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID </th>
+                <th>Rasm</th>
+                <th>Nomi</th>
+                <th>Narxi</th>
+                <th>Katalog</th>
+                <th>Sotuvda bor</th>
+                <th>-</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+              <tr>
+                <td>{{ product.id }}</td>
+                <td><img src="{{ product.image_url }}" class="rounded" alt="Product" width="40"></td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }} SO'M</td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.stock}} {{ product.unit }}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+              {% endfor %}
+              <!-- Add more products here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Add Product -->
+      <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                  {{ form.as_p }}
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor Qilish</button>
+              <button type="submit" class="btn btn-primary">Qo'shish</button>
+            </div>
+            
+          </form>
+          </div>
+        </div>
+      </div>
+{% endblock content %}

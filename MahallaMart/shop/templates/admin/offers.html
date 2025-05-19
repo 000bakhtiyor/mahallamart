@@ -1,0 +1,161 @@
+{% extends "base-admin.html" %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+  <h3 class="mb-0">Takliflar</h3>
+  <div class="d-flex gap-2">
+    <button class="btn btn-success d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addOfferModal">
+      <i class="bi bi-plus-circle"></i> <span>Yangi Taklif Qo'shish</span>
+    </button>
+    <button class="btn btn-info d-flex align-items-center gap-2 text-white" data-bs-toggle="modal" data-bs-target="#addProductofferModal">
+      <i class="bi bi-tags"></i> <span>Mahsulotga chegirma qo'yish</span>
+    </button>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="input-group mb-4">
+    <input type="text" class="form-control" placeholder="Taklif qidirish...">
+    <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+</div>
+
+<!-- Section Title -->
+<div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+  <h4 class="mb-0">Banner Chegirmalari</h4>
+</div>
+
+<!-- Offers Table -->
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Rasm</th>
+          <th>Sarlavha</th>
+          <th>Tavsif</th>
+          <th>Chegirma (%)</th>
+          <th>-</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for offer in offers %}
+        <tr>
+          <td>{{ offer.id }}</td>
+          <td><img src="{{ offer.image_url }}" class="rounded" alt="Offer Image" width="60"></td>
+          <td>{{ offer.title }}</td>
+          <td>{{ offer.description|truncatechars:50 }}</td>
+          <td>{{ offer.discount_percent }}%</td>
+          <td>
+            <button class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center">Takliflar mavjud emas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section Title -->
+<div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+  <h4 class="mb-0">Mahsulot Chegirmalari</h4>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Rasm</th>
+          <th>Mahsulot nomi</th>
+          <th>Tavsif</th>
+          <th>Chegirma (%)</th>
+          <th>Amal qiladi</th>
+          <th>Yaroqlilik muddati</th>
+          <th>-</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for discount in discounts %}
+        <tr>
+          <td>{{ discount.id }}</td>
+          <td>
+            <img src="{{ discount.product.image_url }}" class="rounded" alt="{{ discount.product.name }}" width="60">
+          </td>
+          <td>{{ discount.product.name }}</td>
+          <td>{{ discount.product.description|truncatechars:50 }}</td>
+          <td>{{ discount.percent }}%</td>
+          <td>
+            {% if discount.is_valid %}
+              <span class="badge bg-success">Aktiv</span>
+            {% else %}
+              <span class="badge bg-secondary">Tugagan</span>
+            {% endif %}
+          </td>
+          <td>{{ discount.valid_until }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center">Chegirmalar mavjud emas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- Modal Add Offer -->
+<div class="modal fade" id="addProductofferModal" tabindex="-1" aria-labelledby="addProductofferModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductofferModalLabel">Mahsulotga chegirma qo'yish</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            {{ formProduct.as_p }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+          <button type="submit" class="btn btn-primary">Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Product Offer -->
+<div class="modal fade" id="addOfferModal" tabindex="-1" aria-labelledby="addOfferModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="addOfferModalLabel">Yangi Taklif Qo'shish</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            {{ form.as_p }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+          <button type="submit" class="btn btn-primary">Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

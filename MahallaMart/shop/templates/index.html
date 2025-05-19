@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .scroll-wrapper {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+  }
+  .scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+  }
+  .scroll-wrapper::-webkit-scrollbar-thumb {
+    background-color: #dee2e6;
+    border-radius: 4px;
+  }
+  .product-card-wrapper {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .product-card img {
+    border-radius: 12px 12px 0 0;
+    height: 120px;
+    object-fit: cover;
+  }
+  .discount-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: red;
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    width: fit-content;
+  }
+</style>
+<div class="container mt-3">
+  <!-- 🔍 Search Bar -->
+  <div class="input-group search-box mb-4">
+    <span class="input-group-text" id="search-icon">
+      <i class="bi bi-search text-muted"></i>
+    </span>
+    <input type="search" class="form-control" placeholder="Mahsulot yoki do'konlarni izlash..." aria-label="Search">
+    <button class="btn btn-outline-secondary" type="button">
+      <i class="bi bi-sliders"></i>
+    </button>
+  </div>
+  <!-- 🚚 Delivery Banner -->
+  <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+    <i class="bi bi-lightning-charge-fill me-2 fs-4"></i>
+    <div>
+      <strong>Tezkor yetkazish</strong> hozir siz uchun tekin! 30 daqiqa ichida qo'lingizda bo'ladi.
+    </div>
+  </div>
+
+  <!-- 🔥 Chegirmalar -->
+  <h5 class="section-title mt-3">🔥 Chegirmalar</h5>
+  <style>
+    .horizontal-scroll::-webkit-scrollbar { display: none; }
+    .horizontal-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+  </style>
+  <div class="d-flex overflow-auto gap-3 py-2 px-1 horizontal-scroll">
+    {% for offer in offers %}
+    <div class="card flex-shrink-0 border-0 shadow-sm rounded-4"
+         style="min-width: 280px; background-image: url('{{ offer.image_url }}'); background-size: cover; background-position: center; color: white;">
+      <div class="card-body d-flex flex-column justify-content-between"
+           style="background: rgba(0, 0, 0, 0.4); border-radius: 1rem;">
+        <div>
+          <h6 class="fw-semibold mb-1">{{ offer.title }}</h6>
+          <p class="small mb-2">{{ offer.description }}</p>
+        </div>
+        <div class="text-end">
+          <a href="#" class="btn btn-light btn-sm">{{ offer.discount_percent }}%lik chegirma</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 📂 Categories -->
+  <h5 class="section-title mt-3">Do'konlar bo'yicha katalog</h5>
+  <div class="row mb-4 g-3">
+    {% for category in categories %}
+    <div class="col-6 col-md-3">
+      <div class="category-card p-3 bg-white text-center" role="button" tabindex="0">
+        <div class="category-icon bg-success bg-opacity-10 text-success">
+          {{ category.svg|safe }}
+        </div>
+        <p class="small mb-0 fw-medium">{{ category.name }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 🎟️ Promo Banner -->
+  <h5 class="section-title">Maxsus chegirma takliflar</h5>
+  <div class="card mb-4 border-0 rounded-3 shadow-sm"
+       style="background: linear-gradient(135deg, rgb(248, 68, 74) 0%, rgb(206, 132, 36) 100%);">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <div class="col-12 col-md-8 mb-3 mb-md-0">
+          <h6 class="text-white fw-semibold mb-1">POCHIN11 promokodi bilan!</h6>
+          <p class="text-white small mb-2">Barcha turdagi mahsulotlar uchun 11%lik chegirma</p>
+          <button class="btn btn-light btn-sm">Hoziroq xarid qilish</button>
+        </div>
+        <div class="col-12 col-md-4 text-center">
+          <img src="https://thumbs.dreamstime.com/b/percent-off-sale-special-offer-discount-pink-number-d-rendering-sign-marketing-sales-discounts-promotions-financial-365143761.jpg"
+               loading="lazy" class="img-fluid" alt="Discount Banner" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🛒 Best Selling Products -->
+<h5 class="section-title">Eng Ko'p Sotilayotgan Mahsulotlar</h5>
+
+<div class="scroll-wrapper overflow-auto">
+  <div class="d-flex flex-nowrap gap-3 py-2">
+    {% for product in products %}
+      <div class="product-card-wrapper flex-shrink-0" style="width: 200px;">
+        <article class="product-card h-100" role="button" tabindex="0">
+          <div class="position-relative">
+            <img src="{{ product.image_url }}" loading="lazy" class="product-img w-100" alt="Mahsulot rasmi">
+            {% if product.discounted_price %}<div class="discount-badge">-{{ product.discount_percent }}% chegirmada</div>{% endif %}
+          </div>
+          <div class="p-2">
+            <h6 class="mb-1">{{ product.name }}</h6>
+            <p class="small text-muted mb-1">{{ product.category }} | {{ product.shop }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div>
+                  {% if product.discounted_price %}
+                    <span class="fw-bold text-danger">{{ product.discounted_price|floatformat:0 }} SO'M</span><br>
+                    <span class="small text-muted text-decoration-line-through">{{ product.price|floatformat:0 }} SO'M</span>
+                  {% else %}
+                    <span class="fw-bold">{{ product.price|floatformat:0 }} SO'M</span>
+                  {% endif %}
+                  <div class="delivery-time">30 daqiqa</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-primary rounded-pill add-btn add-to-cart-btn" data-id="{{ product.id }}">
+                <i class="bi bi-cart-plus me-1"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+  <!-- 🏪 Shops -->
+  <h5 class="section-title mb-4">Biz Bilan Birga</h5>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for shop in shops %}
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0">
+        <img src="{{ shop.image_url }}" class="card-img-top" alt="Shop Image">
+        <div class="card-body">
+          <h6 class="card-title mb-1">{{ shop.shop_name }}</h6>
+          <p class="card-text text-muted small">{{ shop.contact_number }} | {{ shop.location }}</p>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{% url "shop" shop.id %}" class="btn btn-sm btn-outline-primary w-100">Do'kondan Savdo Qilish</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 🧭 Browse Categories -->
+  <h5 class="section-title mt-4">Bo'limlar</h5>
+  <div class="list-group mb-5">
+    {% for category in categories %}  
+    <a href="#" class="list-group-item list-group-item-action border-0 rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <div class="category-icon me-3 bg-success bg-opacity-10 p-2 rounded">
+          {{ category.svg|safe }}
+        </div>
+        <div>
+          <h6 class="mb-0">{{ category.name }}</h6>
+          <small class="text-muted">{{ category.description }}</small>
+        </div>
+      </div>
+      <i class="bi bi-chevron-right text-muted"></i>
+    </a>
+    {% endfor %}
+  </div>
+
+
+  <!-- 🏷️ Tags -->
+  <h5 class="section-title">Tez-tez so'raladigan savollar</h5>
+  <div class="accordion mb-5" id="faqAccordion">
+    <div class="accordion-item shadow-sm border-0 rounded-3">
+        <h2 class="accordion-header">
+        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false">
+          FAQ Question
+        </button>
+        </h2>
+        <div id="collapse1" class="accordion-collapse collapse">
+          <div class="accordion-body bg-white text-muted">
+            FAQ Answer
+          </div>
+        </div>
+    </div>
+  </div>
+
+<script>
+document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    const productId = this.dataset.id;
+    fetch("{% url 'add_to_cart' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ product_id: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      window.location.reload();
+    });
+  });
+});
+</script>
+{% endblock %}

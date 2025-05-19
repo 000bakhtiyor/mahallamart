@@ -1,0 +1,67 @@
+{% extends "base-admin.html" %}
+
+{% block content %}
+    <!-- Main content -->
+    <main class="col-md-10 content">
+        <h3 class="mb-4">Kataloglar</h3>
+  
+        <!-- Add Category Button -->
+        <div class="mb-4">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+            Yangi Katalog Yaratish
+          </button>
+        </div>
+  
+        <!-- Categories Table -->
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nomi</th>
+                  <th>SVG</th>
+                  <th>Haqida</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for category in categories %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ category.name }}</td>
+                  <td>
+                    <div class="category-icon bg-success bg-opacity-10 text-success" style="width: 50px; height: 50px;">
+                        {{ category.svg|safe }}
+                    </div>
+                  </td>                               
+                  <td>{{ category.description }}</td>
+                </tr>
+                {% endfor %}
+                <!-- Add more rows as needed -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+  
+  <!-- Modal for Adding Category -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Yangi Katalog Yaratish</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor Qilish</button>
+            <button type="submit" class="btn btn-primary">Katalogni Qo'shish</button>
+          </form>          
+        </div>
+        
+      </div>
+    </div>
+  </div>
+{% endblock content %}

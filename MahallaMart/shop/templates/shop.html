@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block content %}
+
+<a href="{% url 'index' %}" class="btn btn-outline-primary mb-4">Ortga qaytish</a>
+<!-- Shop Banner -->
+<section class="shop-banner parallax-section mb-6 position-relative">
+  <img src="{{ shop.image_url }}" alt="Shop Banner" class="parallax-image">
+  <div class="parallax-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white text-center">
+    <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeInDown">{{ shop.name }}</h1>
+    <div class="d-flex gap-4 mb-4">
+      <div class="text-center">
+        <i class="bi bi-star-fill fs-3 text-warning"></i>
+        <p class="mb-0">5 Darajada</p>
+      </div>
+      <div class="text-center">
+        <i class="bi bi-truck fs-3 text-info"></i>
+        <p class="mb-0">Bepul yetkazib berish</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Products with Filters -->
+<main class="container pb-6">
+  <div class="product-controls sticky-top bg-white py-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center m-3">
+      <div class="d-flex gap-3 flex-wrap">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Saralash bo'yicha</button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Arzondan Qimmatga</a></li>
+            <li><a class="dropdown-item" href="#">Qimmatdan Arzonga</a></li>
+            <li><a class="dropdown-item" href="#">Yangilari</a></li>
+          </ul>
+        </div>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Katalog tanlang</button>
+          <ul class="dropdown-menu">
+            {% for category in categories %}
+              <li><a class="dropdown-item" href="?category={{ category.slug }}">{{ category.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <span class="text-muted">10 ta 120 ta mahsulotdan</span>
+    </div>
+  </div>
+
+  <div class="row g-4 product-grid mt-4">
+    {% for product in products %}
+      <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+        <div class="product-wrapper position-relative rounded-4 overflow-hidden shadow product-color-shape">
+          <article class="card product-card h-100 border-0">
+            <div class="card-image position-relative overflow-hidden rounded-top">
+              <img src="{{ product.image_url }}" class="img-fluid rounded-top" alt="{{ product.name }}">
+              <div class="card-badges position-absolute top-0 end-0 p-2">
+                {% if product.discount and product.discount.is_valid %}
+                  <span class="badge bg-success mb-1 shadow">
+                    -{{ product.discount.percent }}%
+                  </span>
+                {% endif %}
+                <span class="badge bg-primary shadow">{{ product.category.name }}</span>
+              </div>
+              <div class="card-actions position-absolute bottom-0 start-50 translate-middle-x mb-3">
+                <button class="btn btn-light btn-action rounded-circle shadow-sm"><i class="bi bi-heart"></i></button>
+                <button class="btn btn-light btn-action rounded-circle shadow-sm mx-2"><i class="bi bi-arrows-angle-expand"></i></button>
+                <button class="btn btn-light btn-action rounded-circle shadow-sm"><i class="bi bi-share"></i></button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h3 class="h6 fw-bold mb-0">{{ product.name }}</h3>
+                <div class="text-warning small">
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                </div>
+              </div>
+              {% if product.description %}
+                <p class="text-muted small">{{ product.description|truncatewords:15 }}</p>
+              {% endif %}
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  {% if product.discount and product.discount.is_valid %}
+                    <span class="fw-bold text-danger">
+                      {{ product.discount.discounted_price|floatformat:0 }} SO'M
+                    </span><br>
+                    <span class="small text-muted text-decoration-line-through">
+                      {{ product.price|floatformat:0 }} SO'M
+                    </span>
+                  {% else %}
+                    <span class="fw-bold">{{ product.price|floatformat:0 }} SO'M</span>
+                  {% endif %}
+                </div>
+                <button class="btn btn-sm btn-primary rounded-pill px-3 add-to-cart-btn" data-id="{{ product.id }}">
+                  <i class="bi bi-cart-plus me-1"></i>Qo'shish
+                </button>                  
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5">
+        <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_khtt8ejx.json" style="height: 200px;" autoplay loop></lottie-player>
+        <h4>Mahsulotlar topilmadi</h4>
+        <a href="?" class="btn btn-outline-secondary mt-3"><i class="bi bi-x-circle"></i> Boshidan boshlash</a>
+      </div>
+    {% endfor %}
+  </div>
+  
+</main>
+
+<!-- Back to Top -->
+<button class="btn btn-primary btn-back-to-top shadow"><i class="bi bi-arrow-up"></i></button>
+
+<!-- STYLES -->
+<style>
+  :root {
+    --primary-hover: #0b5ed7;
+    --transition-fast: 0.2s ease;
+  }
+
+  .parallax-section {
+    height: 55vh;
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  .parallax-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6);
+  }
+
+  .parallax-overlay {
+    background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+    padding: 2rem;
+  }
+
+  .product-wrapper {
+    background-color: #fff;
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 1.5rem;
+  }
+
+  .product-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.12);
+  }
+
+  .card-image img {
+    transition: transform 0.4s;
+  }
+
+  .product-card:hover .card-image img {
+    transform: scale(1.05);
+  }
+
+  .btn-action {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+  }
+
+  .product-card:hover .btn-action {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .product-color-shape::before {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    top: -40px;
+    left: -40px;
+    background: radial-gradient(circle at top left, rgba(13, 110, 253, 0.1), transparent);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .product-color-shape::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    bottom: -30px;
+    right: -30px;
+    background: radial-gradient(circle at bottom right, rgba(25, 135, 84, 0.1), transparent);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .product-wrapper .card {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  }
+
+  .btn-back-to-top {
+    position: fixed;
+    bottom: 1rem;
+    right: auto;
+    display: none;
+    border-radius: 50%;
+    width: 44px
+    height: 44px;
+  }
+</style>
+
+<!-- SCRIPTS -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const backToTop = document.querySelector('.btn-back-to-top');
+    window.addEventListener('scroll', () => {
+      backToTop.style.display = window.scrollY > 400 ? 'block' : 'none';
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+  document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const productId = this.dataset.id;
+          fetch("{% url 'add_to_cart' %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ product_id: productId })
+          })
+          .then(response => response.json())
+          .then(data => {
+            window.location.reload();
+          });
+        });
+      });
+    });
+</script>
+
+{% endblock %}

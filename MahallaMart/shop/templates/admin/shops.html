@@ -1,0 +1,61 @@
+{% extends "base-admin.html" %}
+{% block content %}
+
+    <!-- Main content -->
+      <h3 class="mb-4">Yangi do'kon kiritish</h3>
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="row g-3">
+              {{ form.shop_name.label_tag }} {{ form.shop_name }}
+              {{ form.owner_name.label_tag }} {{ form.owner_name }}
+              {{ form.location.label_tag }} {{ form.location }}
+              {{ form.contact_number.label_tag }} {{ form.contact_number }}
+              {{ form.image_url.label_tag }} {{ form.image_url }}
+              <div class="col-12 text-end">
+                <button type="reset" class="btn btn-secondary">Tozalash</button>
+                <button type="submit" class="btn btn-primary">Yangi do'kon kiritish</button>
+              </div>
+            </div>
+          </form>
+
+          <hr class="my-5">
+          <h4 class="mb-3">Mavjud do'konlar</h4>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>#</th>
+                  <th>Do'kon nomi</th>
+                  <th>Egasi</th>
+                  <th>Manzili</th>
+                  <th>Aloqa</th>
+                  <th>Rasmi</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                  {% for shop in shops %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ shop.shop_name }}</td>
+                    <td>{{ shop.owner_name }}</td>
+                    <td>{{ shop.location }}</td>
+                    <td>{{ shop.contact_number }}</td>
+                    <td><img src="{{ shop.image_url }}" class="img-thumbnail" width="60"></td>
+                    <td>
+                      <button class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></button>
+                      <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+{% endblock %}

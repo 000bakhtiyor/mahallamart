@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+  .checkout-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  }
+
+  .payment-logo {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+  }
+  
+  .section {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .location-input, .personal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+  }
+  
+  input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  }
+  
+  button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  }
+  
+  .geo-btn {
+  background: #e3f2fd;
+  color: #1976d2;
+  }
+  
+  .apply-btn {
+  background: #4CAF50;
+  color: white;
+  }
+  
+  .map-preview {
+  height: 150px;
+  background: #f5f5f5;
+  border-radius: 5px;
+  margin-top: 10px;
+  }
+  
+  .payment-option {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  }
+  
+  .payment-option:hover {
+  border-color: #2196F3;
+  }
+  
+  .order-summary {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  }
+  
+  .total {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 20px 0;
+  }
+  
+  .checkout-btn {
+  padding: 15px;
+  background: #2196F3;
+  color: white;
+  font-size: 1.1em;
+  }
+  
+  .promo-status {
+  margin-top: 10px;
+  color: #4CAF50;
+  font-weight: bold;
+  }
+  .toast {
+    position: fixed;
+    top: auto;
+    right: 30px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-size: 1em;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+  }
+  
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .toast.hidden {
+    display: none;
+  }
+  
+</style>
+<div class="checkout-container">
+  <div class="section">
+    <h2>Yetkazib berish manzili</h2>
+    <div class="location-input">
+    <input type="text" placeholder="Manzilni kiriting" id="address">
+    <button class="geo-btn" onclick="getLocation()">📍 Joriy manzilni ishlatish</button>
+    </div>
+    <div id="map-preview" class="map-preview"></div>
+  </div>
+
+  <div class="section">
+    <h2>Shaxsiy ma'lumotlar</h2>
+    <div class="personal-info">
+    <input type="text" placeholder="To'liq ismingizni kiriting" id="full-name">
+    <input type="text" placeholder="Telefon raqamingizni kiriting" id="phone-number">
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2>Promo kodni qo'llash</h2>
+    <div class="promo-code">
+    <input type="text" placeholder="Promo kodni kiriting" id="promo-code">
+    <button class="apply-btn" onclick="applyPromo()">Qo'llash</button>
+    </div>
+    <div id="promo-status" class="promo-status"></div>
+  </div>
+  
+  <div class="section">
+    <h2>To'lov usuli</h2>
+    <div class="payment-methods">
+    <div class="payment-option" onclick="selectPayment('karta')">
+      <input type="radio" name="payment" id="credit" value="credit">
+      <label for="credit">💳 Kredit/Debet karta</label>
+    </div>
+    <div>
+      <div class="payment-options-horizontal">
+      <div class="payment-option" onclick="selectPayment('click')">
+        <input type="radio" name="payment" id="click" value="click">
+        <label for="click">
+        <img src="https://click.uz/click/images/click-white.jpg" alt="Click" class="payment-logo">
+        </label>
+      </div>
+      <div class="payment-option" onclick="selectPayment('payme')">
+        <input type="radio" name="payment" id="payme" value="payme">
+        <label for="payme">
+        <img src="https://marketing.uz/uz/uploads/articles/1284/article-original.jpg" alt="Payme" class="payment-logo">
+        </label>
+      </div>
+      </div>
+    </div>
+    <div class="payment-option" onclick="selectPayment('Naqd')">
+      <input type="radio" name="payment" id="cod" value="cod">
+      <label for="cod">💵 Yetkazib berishda naqd</label>
+    </div>
+    </div>
+  </div>
+
+<div id="toast" class="toast hidden">Buyurtma qabul qilindi. Siz bilan tez orada bog'lanishadi</div>
+  
+  <div class="order-summary">
+    <h3>Buyurtma xulosasi</h3>
+    <ul class="list-group">
+      {% for item in cart_items %}
+        <li class="coda list-group-item d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+            <div>
+              <h6 class="mb-1">{{ item.product.name }}</h6>
+              <small class="text-muted d-flex align-items-center">
+                <input 
+                  type="number" 
+                  min="1" 
+                  value="{{ item.quantity }}" 
+                  class="form-control form-control-sm quantity-input" 
+                  data-product-id="{{ item.product.id }}" 
+                  style="width: 50px;"
+                >
+                <span class="ms-2 me-2">{{ item.product.unit }}</span>x   
+                {% if item.product.discount and item.product.discount.is_valid %}
+                   <span class="text-danger ms-2"> {{ item.product.discount.discounted_price|floatformat:0 }} SO'M</span>
+                   <del class="ms-1"> {{ item.product.price|floatformat:0 }} SO'M</del>
+                {% else %}
+                   <span class="ms-2"> {{ item.product.price|floatformat:0 }} SO'M</span>
+                {% endif %}
+              </small>
+            </div>
+          </div>
+          <span class="fw-bold">{{ item.total_price|floatformat:0 }} SO'M</span>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-center text-muted">Savat bo'sh</li>
+      {% endfor %}
+    </ul>
+    <div class="summary-item">
+    <span>Mahsulotlar ({{ all_products_count }}):</span>
+    <span>{{ total }} SO'M</span>
+    </div>
+    <div class="summary-item">
+    <span>Yetkazib berish:</span>
+    <span>0.00 SO'M</span>
+    </div>
+    <div class="summary-item discount">
+    <span>Chegirma:</span>
+    <span>0.00 SO'M</span>
+    </div>
+    <div class="total">
+    <span>Jami:</span>
+    <span>{{ total }} SO'M</span>
+    </div>
+    <button class="checkout-btn" onclick="processPayment()">Xaridni yakunlash</button>
+  </div>
+  </div>
+
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        document.getElementById('address').value = `${latitude},${longitude}`;
+      },
+      (error) => {
+        alert('Manzilni aniqlashda xatolik yuz berdi.'+ error.message);
+      }
+    );
+  } else {
+    alert('Brauzeringiz geolokatsiyani qo\'llab-quvvatlamaydi.');
+  }
+  }
+  
+  function applyPromo() {
+  const promoCode = document.getElementById('promo-code').value;
+  const promoStatus = document.getElementById('promo-status');
+  
+  if(promoCode === 'SAVE10') {
+    promoStatus.textContent = 'Promo kod muvaffaqiyatli qo\'llandi!';
+    promoStatus.style.color = '#4CAF50';
+  } else {
+    promoStatus.textContent = 'Noto\'g\'ri promo kod';
+    promoStatus.style.color = '#f44336';
+  }
+  }
+  
+  function selectPayment(method) {
+    console.log('Tanlangan to\'lov usuli:', method);
+  }
+  
+  function processPayment() {
+
+    const selectedPaymentMethod = document.querySelector('input[name="payment"]:checked')?.id;
+    const address = document.getElementById('address').value;
+    const fullName = document.getElementById('full-name').value;
+    const phoneNumber = document.getElementById('phone-number').value;
+    const promoCode = document.getElementById('promo-code').value;
+    
+    const cartItems = document.querySelectorAll('.coda');
+    
+    const products = [];
+    
+    
+    cartItems.forEach(item => {
+      const name = item.querySelector('h6')?.innerText.trim();
+      const quantityInput = item.querySelector('.quantity-input');
+      const quantity = quantityInput?.value;
+      const productId = quantityInput?.getAttribute('data-product-id');
+      const unit = item.querySelector('small .ms-2.me-2')?.innerText.trim();
+      const priceElement = item.querySelector('.text-danger') || item.querySelector('.ms-2:not(.me-2)');
+      const price = priceElement?.innerText.trim();
+      const total = item.querySelector('.fw-bold')?.innerText.trim();
+      if (name && quantity && productId) {
+        products.push({
+          product_id: productId,
+          name: name,
+          quantity: quantity,
+          unit: unit,
+          price: price,
+          total: total 
+        });
+      }
+    });
+    // Step 2: Create full data object
+    const data = {
+      full_name: fullName,
+      phone_number: phoneNumber,
+      address: address,
+      promo_code: promoCode,
+      payment_method: selectedPaymentMethod,
+      total: {{ total }},
+      all_products_count: {{ all_products_count }},
+      cart_items: products
+    };
+  
+  if (!address) {
+    alert('Iltimos manzilni kiriting!');
+    return;
+  }
+  if (!fullName) {
+    alert('Ismingizni kiriting!');
+    return;
+  }
+  if (!phoneNumber) {
+    alert('Siz bilan bog`lanish uchun telefon nomer kiriting!');
+    return;
+  }
+  if (!selectedPaymentMethod) {
+    alert('To`lov turini tanlang!');
+    return;
+  }
+  
+  
+  fetch("{% url 'complete_order' %}", {  // your backend endpoint
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    'X-CSRFToken': '{{ csrf_token }}'  // if using Django CSRF protection
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if(result.success){
+      const toast = document.getElementById('toast');
+      toast.classList.remove('hidden');
+      toast.classList.add('show');
+    
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hidden');
+        window.location.href = "{% url 'clear_cart' %}";
+        window.location.href = "{% url 'index' %}";
+      }, 3000);
+    }
+     else {
+      alert('Xatolik yuz berdi');
+    }
+  })
+  .catch(error => {
+    alert('Xatolik yuz berdi', error.message);
+  });
+  }
+</script>
+{% endblock %}
