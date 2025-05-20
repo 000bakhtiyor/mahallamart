@@ -23,9 +23,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zdv2rgm94g9_da+njr*x$^e#n&__xo1ckbi#lq71w8o!4p!s57'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['.onrender.com', 'mahallamart.uz']
+# settings.py
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://mahallamart.onrender.com",
+    "https://mahallamart.uz",
+    "https://www.mahallamart.uz",
+]
+
+
+ALLOWED_HOSTS = [
+    "mahallamart.onrender.com",
+    "mahallamart.uz",
+    "www.mahallamart.uz",
+]
+
 
 # Application definition
 
