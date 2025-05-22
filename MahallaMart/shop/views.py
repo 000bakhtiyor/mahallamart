@@ -75,6 +75,11 @@ def escape_markdown(text):
     escape_chars = r'_*[]()~`>#+-=|{}.!'
     return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', str(text))
 
+<<<<<<< HEAD
+=======
+TELEGRAM_BOT_TOKEN = ''
+TELEGRAM_CHAT_ID = ''
+>>>>>>> 180c0130c6a8c8daeb4d092d9a09ad2510e27605
 
 def complete_order(request):
     if request.method == 'POST':
