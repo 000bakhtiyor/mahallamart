@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zdv2rgm94g9_da+njr*x$^e#n&__xo1ckbi#lq71w8o!4p!s57'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # settings.py
 
@@ -33,8 +33,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.mahallamart.uz",
 ]
 
-
 ALLOWED_HOSTS = [
+    '13.40.151.11',
+    "localhost",
     "mahallamart.onrender.com",
     "mahallamart.uz",
     "www.mahallamart.uz",

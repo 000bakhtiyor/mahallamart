@@ -15,13 +15,66 @@ import requests
 from django.http import JsonResponse
 
 import re
+import os
+
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+
+print(TELEGRAM_BOT_TOKEN)
+print(TELEGRAM_CHAT_ID)
+def search_api(request):
+    query = request.GET.get('q', '')
+    products = []
+
+    if query:
+        products_queryset = Product.objects.filter(name__icontains=query)[:10]
+        products = [{'id': p.id, 'image_url':p.image_url, 'name': p.name, 'price': p.price} for p in products_queryset]
+
+    return JsonResponse({'products': products})
+
+def search(request):
+    products = Product.objects.select_related('discount', 'category', 'shop').all()
+    today = date.today()
+
+    for product in products:
+        try:
+            discount = product.discount
+            if discount.valid_from <= today <= discount.valid_until:
+                product.discounted_price = discount.discounted_price()
+                product.discount_percent = discount.percent
+            else:
+                product.discounted_price = None
+                product.discount_percent = 0
+        except:
+            product.discounted_price = None
+            product.discount_percent = 0
+
+    base_context = {
+        'categories': Category.objects.all(),
+        'shops': Shop.objects.all(),
+        'products': products,
+        'offers': Offer.objects.all(),
+        'cart_items': cart_view(request)[0],
+        'total': cart_view(request)[1],
+        'all_products_count': cart_view(request)[2]
+    }
+    query = request.GET.get('q', '').strip()
+    filtered_products = Product.objects.filter(name__icontains=query)
+    filtered_shops = Shop.objects.filter(shop_name__icontains=query)
+
+    context = {
+        **base_context,
+        'query': query,
+        'search_products': filtered_products,
+        'search_shops': filtered_shops,
+    }
+
+    return render(request, 'index.html', context)
 
 def escape_markdown(text):
     escape_chars = r'_*[]()~`>#+-=|{}.!'
     return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', str(text))
 
-TELEGRAM_BOT_TOKEN = '7621340217:AAEO1Ls0-ecsqyl59j3oEFQNd3HoMM5JLp8'
-TELEGRAM_CHAT_ID = '1637858860'
 
 def complete_order(request):
     if request.method == 'POST':
@@ -108,6 +161,7 @@ def clear_cart(request):
     return redirect(request.META.get('HTTP_REFERER', 'index'))
 
 from datetime import date
+import os
 
 def cart_view(request):
     cart_list = request.session.get("cart", [])
@@ -210,7 +264,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-def test(request):
+def itest(request):
     return render(request, 'test.html')
 
 

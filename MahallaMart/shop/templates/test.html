@@ -1,165 +1,65 @@
-<button id="locationButton" class="btn btn-link text-dark" aria-label="select location">
-  <i class="bi bi-geo-alt-fill fs-5"></i> Manzilni tanlang
-</button>
+{% extends "base-admin.html" %}
+{% block content %}
 
-<div id="mapPopup" class="map-popup">
-  <button id="closeMapButton" class="btn-close" aria-label="Close"></button>
-  <div id="map" class="map-container"></div>
-  <div id="selectedLocationDisplay" class="mt-3 text-center text-muted">
-    No location selected.
+<!-- Main Content -->
+<div class="container mt-4">
+  <h4 class="section-title">Electronics</h4>
+  
+  <div class="row g-4">
+    <!-- Product Card -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card product-card">
+        <span class="badge bg-danger position-absolute top-0 start-0 m-2">-20%</span>
+        <img src="https://placehold.co/600x400" class="product-img" alt="Wireless Headphones">
+        <div class="card-body">
+          <h6 class="card-title mb-1">Wireless Headphones</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-danger fw-bold">$199.99</span>
+              <span class="text-muted text-decoration-line-through ms-2">$249.99</span>
+            </div>
+          </div>
+          <span class="delivery-time text-muted">2h Delivery</span>
+          <button class="btn btn-primary add-btn w-100 mt-2">
+            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Card -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card product-card">
+        <img src="https://placehold.co/600x400" class="product-img" alt="Smart Watch Pro">
+        <div class="card-body">
+          <h6 class="card-title mb-1">Smart Watch Pro</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold">$299.99</span>
+          </div>
+          <span class="delivery-time text-muted">1d Delivery</span>
+          <button class="btn btn-primary add-btn w-100 mt-2">
+            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add more product cards -->
   </div>
-  <div class="manual-address mt-3">
-    <input id="manualAddressInput" type="text" class="form-control" placeholder="Enter address manually">
-    <button id="manualAddressButton" class="btn btn-secondary mt-2">Set Address</button>
-  </div>
-  <button id="confirmLocationButton" class="btn btn-primary mt-3">Confirm Location</button>
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-4">
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+      </li>
+      <li class="page-item"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item">
+        <a class="page-link" href="#">Next</a>
+      </li>
+    </ul>
+  </nav>
 </div>
-
-<style>
-  .map-popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    height: 80%;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    padding: 20px;
-  }
-
-  .btn-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .map-container {
-    width: 100%;
-    height: 70%;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .btn-primary {
-    display: block;
-    margin: 0 auto;
-  }
-
-  .manual-address {
-    text-align: center;
-  }
-</style>
-
-<script src="https://maps.googleapis.com/maps/api/js"></script>
-<script>
-  let selectedLocation = null;
-  let marker = null;
-
-  document.getElementById('locationButton').addEventListener('click', function() {
-    document.getElementById('mapPopup').style.display = 'block';
-    initMap();
-  });
-
-  document.getElementById('closeMapButton').addEventListener('click', function() {
-    document.getElementById('mapPopup').style.display = 'none';
-  });
-
-  document.getElementById('confirmLocationButton').addEventListener('click', function() {
-    if (selectedLocation) {
-      const locationButton = document.getElementById('locationButton');
-      locationButton.innerHTML = `<i class="bi bi-geo-alt-fill fs-5"></i> Location Selected`;
-      document.getElementById('mapPopup').style.display = 'none';
-
-      // Copy latitude and longitude to clipboard
-      const latLngText = `Lat: ${selectedLocation.lat}, Lng: ${selectedLocation.lng}`;
-      navigator.clipboard.writeText(latLngText).then(() => {
-        alert('Location copied to clipboard: ' + latLngText);
-      }).catch(err => {
-        console.error('Failed to copy location: ', err);
-      });
-    } else {
-      alert('Please select a location on the map.');
-    }
-  });
-
-  document.getElementById('manualAddressButton').addEventListener('click', function() {
-    const address = document.getElementById('manualAddressInput').value;
-    if (address) {
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address: address }, function(results, status) {
-        if (status === 'OK') {
-          const location = results[0].geometry.location;
-          selectedLocation = {
-            lat: location.lat(),
-            lng: location.lng()
-          };
-
-          // Update the map and marker
-          const map = new google.maps.Map(document.getElementById('map'), {
-            center: location,
-            zoom: 12
-          });
-
-          if (marker) {
-            marker.setPosition(location);
-          } else {
-            marker = new google.maps.Marker({
-              position: location,
-              map: map,
-              title: 'Selected Location',
-              icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-            });
-          }
-
-          // Display the selected location coordinates
-          const locationDisplay = document.getElementById('selectedLocationDisplay');
-          locationDisplay.textContent = `Selected Location: Lat: ${selectedLocation.lat.toFixed(6)}, Lng: ${selectedLocation.lng.toFixed(6)}`;
-        } else {
-          alert('Geocode was not successful for the following reason: ' + status);
-        }
-      });
-    } else {
-      alert('Please enter an address.');
-    }
-  });
-
-  function initMap() {
-    const mapOptions = {
-      center: { lat: 38.867302666762875, lng: 65.6211406027038 },
-      zoom: 12
-    };
-    const map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-    map.addListener('click', function(event) {
-      selectedLocation = {
-        lat: event.latLng.lat(),
-        lng: event.latLng.lng()
-      };
-
-      // Update the marker position
-      if (marker) {
-        marker.setPosition(event.latLng);
-      } else {
-        marker = new google.maps.Marker({
-          position: event.latLng,
-          map: map,
-          title: 'Selected Location',
-          icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-        });
-      }
-
-      // Display the selected location coordinates
-      const locationDisplay = document.getElementById('selectedLocationDisplay');
-      locationDisplay.textContent = `Selected Location: Lat: ${selectedLocation.lat.toFixed(6)}, Lng: ${selectedLocation.lng.toFixed(6)}`;
-    });
-  }
-</script>
+{% endblock %}
