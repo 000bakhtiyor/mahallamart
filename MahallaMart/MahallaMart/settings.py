@@ -34,6 +34,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 ALLOWED_HOSTS = [
+    "*",
     '13.40.151.11',
     "localhost",
     "mahallamart.onrender.com",

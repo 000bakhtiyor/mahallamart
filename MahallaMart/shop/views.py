@@ -13,9 +13,22 @@ import requests
 import json
 import requests
 from django.http import JsonResponse
-
+from django.shortcuts import get_object_or_404
 import re
 import os
+
+def category_detail(request, id):
+
+    category = get_object_or_404(Category, id=id)
+    products = Product.objects.filter(category=category)
+    categories = Category.objects.all()
+    return render(request, 'category_detail.html', {
+        'shop': category,
+        'products': products,
+        'cart_items': cart_view(request)[0],
+        'total': cart_view(request)[1],
+        'all_products_count': cart_view(request)[2]
+    })
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')

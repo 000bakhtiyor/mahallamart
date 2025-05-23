@@ -136,12 +136,14 @@
   <div class="row mb-4 g-3">
     {% for category in categories %}
     <div class="col-6 col-md-3">
-      <div class="category-card p-3 bg-white text-center" role="button" tabindex="0">
-        <div class="category-icon bg-success bg-opacity-10 text-success">
-          {{ category.svg|safe }}
+      <a href="{% url 'category_detail' category.id %}" class="col-6 col-md-3 text-decoration-none text-dark">
+        <div class="category-card p-3 bg-white text-center">
+          <div class="category-icon bg-success bg-opacity-10 text-success">
+            {{ category.svg|safe }}
+          </div>
+          <p class="small mb-0 fw-medium">{{ category.name }}</p>
         </div>
-        <p class="small mb-0 fw-medium">{{ category.name }}</p>
-      </div>
+      </a>      
     </div>
     {% endfor %}
   </div>

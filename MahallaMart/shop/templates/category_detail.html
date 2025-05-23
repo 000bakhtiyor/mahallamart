@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex align-items-center mb-4 mt-4">
+    <a href="{% url 'index' %}" class="btn btn-light border rounded-pill shadow-sm d-flex align-items-center gap-3 px-4 py-2">
+        <i class="bi bi-arrow-left-circle-fill fs-4 text-primary"></i>
+        <span class="fw-bold text-primary">Ortga qaytish</span>
+    </a>
+</div>
+
+<!-- Shop Banner -->
+<section class="shop-banner mb-6 position-relative overflow-hidden bg-primary bg-gradient text-white py-6">
+    <div class="banner-content text-center position-relative">
+      <div class="container">
+        <h1 class="display-4 fw-bold mb-3">{{ shop.name }}</h1>
+        
+        <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+          <div class="rating-badge bg-dark bg-opacity-75 rounded-pill px-4 py-2 d-flex align-items-center">
+            <i class="bi bi-star-fill text-warning me-2"></i>
+            <span>5.0 (120 baho)</span>
+          </div>
+          <div class="delivery-badge bg-dark bg-opacity-75 rounded-pill px-4 py-2 d-flex align-items-center">
+            <i class="bi bi-lightning-charge-fill text-success me-2"></i>
+            <span>Tezkor yetkazish</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+<!-- Products with Filters -->
+<main class="container pb-6">
+  <div class="product-controls sticky-top bg-white py-3 shadow-sm">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex flex-wrap gap-3">
+          <div class="dropdown">
+            <button class="btn btn-outline-dark dropdown-toggle rounded-pill" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-filter me-2"></i>Saralash
+            </button>
+            <ul class="dropdown-menu dropdown-menu-start">
+              <li><a class="dropdown-item" href="#"><i class="bi bi-sort-numeric-down me-2"></i>Arzondan Qimmatga</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-sort-numeric-up-alt me-2"></i>Qimmatdan Arzonga</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history me-2"></i>Yangilari</a></li>
+            </ul>
+          </div>
+          
+          <div class="dropdown">
+            <button class="btn btn-outline-dark dropdown-toggle rounded-pill" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-tags me-2"></i>Kategoriyalar
+            </button>
+            <ul class="dropdown-menu">
+              {% for category in categories %}
+                <li><a class="dropdown-item d-flex align-items-center" href="?category={{ category.slug }}">
+                  <img src="{{ category.icon_url }}" alt="{{ category.name }}" class="me-2" width="24">
+                  {{ category.name }}
+                </a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge bg-primary rounded-pill">120 ta mahsulot</span>
+          <div class="input-group input-group-sm" style="max-width: 200px;">
+            <input type="text" class="form-control rounded-start-pill" placeholder="Qidirish...">
+            <button class="btn btn-primary rounded-end-pill"><i class="bi bi-search"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 product-grid mt-4">
+    {% for product in products %}
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <div class="product-card card h-100 border-0 shadow-sm overflow-hidden transition-all">
+          <div class="card-image position-relative overflow-hidden">
+            <img src="{{ product.image_url }}" class="img-fluid" alt="{{ product.name }}" loading="lazy">
+            <div class="card-badges position-absolute top-0 start-0 p-2">
+              {% if product.discount and product.discount.is_valid %}
+                <span class="badge bg-danger rounded-pill mb-1 shadow-sm">
+                  -{{ product.discount.percent }}%
+                </span>
+              {% endif %}
+              <span class="badge bg-dark bg-opacity-75 rounded-pill shadow-sm">
+                {{ product.category.name }}
+              </span>
+            </div>
+            <div class="card-hover-actions position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
+              <button class="btn btn-light btn-icon rounded-circle shadow-sm">
+                <i class="bi bi-heart"></i>
+              </button>
+              <button class="btn btn-light btn-icon rounded-circle shadow-sm mx-2">
+                <i class="bi bi-arrows-angle-expand"></i>
+              </button>
+              <button class="btn btn-light btn-icon rounded-circle shadow-sm">
+                <i class="bi bi-share"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="card-body position-relative">
+            <h3 class="h6 fw-bold mb-2">{{ product.name }}</h3>
+            
+            <div class="product-rating mb-3">
+              <div class="stars text-warning small">
+                  <i class="bi bi-star-fill"></i>
+                {% comment %} <span class="text-muted ms-2">({{ product.review_count }})</span> {% endcomment %}
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                {% if product.discount and product.discount.is_valid %}
+                  <div class="d-flex align-items-baseline gap-2">
+                    <span class="h5 fw-bold text-danger mb-0">
+                      {{ product.discount.discounted_price|floatformat:0 }} SO'M
+                    </span>
+                    <span class="text-muted text-decoration-line-through small">
+                      {{ product.price|floatformat:0 }}
+                    </span>
+                  </div>
+                {% else %}
+                  <span class="h5 fw-bold text-dark">{{ product.price|floatformat:0 }} SO'M</span>
+                {% endif %}
+              </div>
+              <button class="btn btn-primary rounded-pill px-3 add-to-cart-btn" data-id="{{ product.id }}">
+                <i class="bi bi-cart-plus me-1"></i>Savatga
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-6">
+        <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_khtt8ejx.json" 
+                      style="height: 200px;" 
+                      background="transparent" 
+                      speed="1" 
+                      loop 
+                      autoplay>
+        </lottie-player>
+        <h4 class="mb-3">Hech qanday mahsulot topilmadi</h4>
+        <p class="text-muted mb-4">Boshqa filterlarni sinab ko'ring yoki keyinroq qayta urinib ko'ring</p>
+        <a href="?" class="btn btn-outline-dark rounded-pill">
+          <i class="bi bi-arrow-clockwise me-2 mb-3"></i>Filterlarni tozalash
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  <nav class="mt-6 d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+      <li class="page-item active"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+    </ul>
+  </nav>
+</main>
+
+<!-- Back to Top -->
+<button class="btn btn-primary btn-back-to-top shadow-lg rounded-circle">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
+<style>
+  .shop-banner {
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    min-height: 400px;
+  }
+
+  .banner-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.7);
+    transform: scale(1);
+    transition: transform 10s linear;
+  }
+
+  .shop-banner:hover .banner-background {
+    transform: scale(1.05);
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: 2;
+    padding: 4rem 0;
+  }
+
+  .product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 1rem;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .card-image {
+    height: 250px;
+    background-color: #f8f9fa;
+  }
+
+  .card-image img {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+    transition: transform 0.3s ease;
+  }
+
+  .card-hover-actions {
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+  }
+
+  .product-card:hover .card-hover-actions {
+    opacity: 1;
+  }
+
+  .btn-back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn-back-to-top.show {
+    opacity: 1;
+  }
+
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    .shop-banner {
+      min-height: 300px;
+    }
+    
+    .banner-content {
+      padding: 2rem 0;
+    }
+    
+    .banner-content h1 {
+      font-size: 2rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Back to Top Button
+    const backToTop = document.querySelector('.btn-back-to-top');
+    window.addEventListener('scroll', () => {
+      backToTop.classList.toggle('show', window.scrollY > 400);
+    });
+    
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Add to Cart Animation
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const productId = this.dataset.id;
+        
+        // Add animation
+        this.classList.add('active');
+        setTimeout(() => this.classList.remove('active'), 300);
+
+        // API call
+        fetch("{% url 'add_to_cart' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.reload();
+        });
+      });
+    });
+  });
+</script>
+
+{% endblock %}
