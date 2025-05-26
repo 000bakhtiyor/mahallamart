@@ -17,6 +17,23 @@ from django.shortcuts import get_object_or_404
 import re
 import os
 
+
+
+@csrf_exempt
+def update_cart_quantity(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        product_id = data.get("product_id")
+        quantity = int(data.get("quantity", 1))
+
+        cart = request.session.get("cart", [])
+        cart.append(product_id)
+        request.session["cart"] = cart
+
+    return JsonResponse({"message": "Successfully"}, status=200) 
+    return JsonResponse({"error": "Invalid request method"}, status=400) 
+
+
 def category_detail(request, id):
 
     category = get_object_or_404(Category, id=id)
@@ -140,7 +157,6 @@ def complete_order(request):
                 ]
             })
         }
-
         response = requests.post(telegram_url, data=payload)
 
         if response.status_code == 200:

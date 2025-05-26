@@ -164,7 +164,7 @@
           <i class="bi bi-telephone-fill me-1"></i> +998 91 474 50 99
         </a>
         <a href="mailto:info@mahallamart.uz" class="text-white text-decoration-none">
-          <i class="bi bi-envelope-fill me-1"></i> mahallamart@gmail.com
+          <i class="bi bi-envelope-fill me-1"></i> bakhtiyordoniev@gmail.com
         </a>
       </div>
     </div>
@@ -181,10 +181,12 @@
 <div class="cart-icon position-fixed bottom-0 end-0 m-4" style="z-index: 1055;">
   <button class="btn btn-primary rounded-rectangle p-3" data-bs-toggle="modal" data-bs-target="#cartModal">
     <i class="bi bi-cart-fill fs-4"></i> Savatcha
+    {% if all_products_count > 0 %}
     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
       {{ all_products_count }}
       <span class="visually-hidden">unread messages</span>
     </span>
+    {% endif %}
   </button>
 </div>
 <!-- 📞 Contact Icons -->
@@ -272,8 +274,34 @@
     </script>
     
     
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</body>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.quantity-input').forEach(input => {
+          input.addEventListener('change', function () {
+            const productId = this.dataset.productId;
+            const newQuantity = this.value;
+    
+            fetch("{% url 'update_cart_quantity' %}", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+              },
+              body: JSON.stringify({
+                product_id: productId,
+                quantity: newQuantity
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              window.location.reload();
+            });
+          });
+        });
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </body>
 </html>
