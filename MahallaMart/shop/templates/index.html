@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 
 {% block content %}
 <style>
@@ -98,7 +99,7 @@
       </div>
     </div>
   </div>
-
+  {% include "story_widget.html" %}
   <!-- 🚚 Delivery Banner -->
   <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
     <i class="bi bi-lightning-charge-fill me-2 fs-4"></i>
@@ -221,38 +222,47 @@
   </div>
 
   <!-- 🧭 Browse Categories -->
-  <h5 class="section-title mt-4">Bo'limlar</h5>
-  <div class="row mb-5">
-    {% for category in categories %}
-    <div class="col-12 mb-4">
+  {% load custom_filters %}
+<h5 class="section-title mt-4">Bo'limlar</h5>
+<div class="row mb-5">
+  {% for category in categories %}
+  <div class="col-12 mb-4">
+    <div class="d-flex flex-column align-items-start">
       <h6 class="fw-bold">{{ category.name }}</h6>
       <p class="text-muted small">{{ category.description }}</p>
-      <div class="d-flex flex-wrap gap-3">
-        {% for product in category.products.all %}
-        <div class="product-card-wrapper flex-shrink-0" style="width: 180px;">
-          <article class="product-card h-100">
-            <div class="position-relative">
-              <img src="{{ product.image_url }}" loading="lazy" class="product-img w-100" alt="Mahsulot rasmi">
-              {% if product.discount_percent %}
-              <div class="discount-badge">-{{ product.discount_percent }}%</div>
-              {% endif %}
-            </div>
-            <div class="p-2">
-              <h6 class="mb-1 small">{{ product.name }}</h6>
-              <div class="d-flex justify-content-between align-items-center">
-                {% if product.discounted_price %}
-                <span class="fw-bold text-danger small">{{ product.discounted_price|floatformat:0 }} SO'M</span>
-                {% endif %}
-                <span class="fw-bold  small">{{ product.price|floatformat:0 }} SO'M</span>
-              </div>
-            </div>
-          </article>
-        </div>
-        {% endfor %}
+      <div class="mt-2">
+        {{ category.svg|safe }}
       </div>
     </div>
-    {% endfor %}
+    <div class="d-flex overflow-auto gap-3 py-2 horizontal-scroll">
+      {% for product in products_by_category|get_item:category %}
+      <div class="product-card-wrapper flex-shrink-0" style="width: 180px;">
+        <article class="product-card h-100">
+          <div class="position-relative">
+            <img src="{{ product.image_url }}" loading="lazy" class="product-img w-100" alt="Mahsulot rasmi">
+          </div>
+          <div class="p-2">
+            <h6 class="mb-1 small">{{ product.name }}</h6>
+            <div class="d-flex justify-content-between align-items-center">
+              {% if product.discounted_price %}
+                <span class="fw-bold small text-danger">{{ product.discounted_price|floatformat:0 }} SO'M</span>
+                <span class="fw-bold small text-decoration-line-through">{{ product.price|floatformat:0 }} SO'M</span>
+                {% else %}
+                <span class="fw-bold small">{{ product.price|floatformat:0 }} SO'M</span>
+              {% endif %}
+              <button class="btn btn-sm btn-primary rounded-pill add-btn add-to-cart-btn" data-id="{{ product.id }}">
+                <i class="bi bi-cart-plus me-1"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
   </div>
+  {% endfor %}
+</div>
+
 
 
   <!-- 🏷️ Tags -->

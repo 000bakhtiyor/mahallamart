@@ -17,6 +17,43 @@ from django.shortcuts import get_object_or_404
 import re
 import os
 
+from collections import defaultdict
+from datetime import date
+
+def index(request):
+    today = date.today()
+    products = Product.objects.select_related('discount', 'category', 'shop').all()
+
+    # Apply discount logic
+    for product in products:
+        try:
+            discount = product.discount
+            if discount.valid_from <= today <= discount.valid_until:
+                product.discounted_price = discount.discounted_price()
+                product.discount_percent = discount.percent
+            else:
+                product.discounted_price = None
+                product.discount_percent = 0
+        except:
+            product.discounted_price = None
+            product.discount_percent = 0
+
+    # Group products by category
+    products_by_category = defaultdict(list)
+    for product in products:
+        products_by_category[product.category].append(product)
+
+    context = {
+        'categories': Category.objects.all(),
+        'products_by_category': products_by_category,
+        'shops': Shop.objects.all(),
+        'products': products,
+        'offers': Offer.objects.all(),
+        'cart_items': cart_view(request)[0],
+        'total': cart_view(request)[1],
+        'all_products_count': cart_view(request)[2]
+    }
+    return render(request, 'index.html', context)
 
 
 @csrf_exempt
@@ -24,10 +61,12 @@ def update_cart_quantity(request):
     if request.method == "POST":
         data = json.loads(request.body)
         product_id = data.get("product_id")
-        quantity = int(data.get("quantity", 1))
+        quantity = int(data.get("quantity"))
 
         cart = request.session.get("cart", [])
-        cart.append(product_id)
+        cart_counter = Counter(cart)
+        cart_counter[str(product_id)] = quantity
+        cart = list(cart_counter.elements())
         request.session["cart"] = cart
 
     return JsonResponse({"message": "Successfully"}, status=200) 
@@ -274,33 +313,33 @@ def shop(request, id):
 
 
 
-def index(request):
-    products = Product.objects.select_related('discount', 'category', 'shop').all()
-    today = date.today()
+# def index(request):
+#     products = Product.objects.select_related('discount', 'category', 'shop').all()
+#     today = date.today()
 
-    for product in products:
-        try:
-            discount = product.discount
-            if discount.valid_from <= today <= discount.valid_until:
-                product.discounted_price = discount.discounted_price()
-                product.discount_percent = discount.percent
-            else:
-                product.discounted_price = None
-                product.discount_percent = 0
-        except:
-            product.discounted_price = None
-            product.discount_percent = 0
+#     for product in products:
+#         try:
+#             discount = product.discount
+#             if discount.valid_from <= today <= discount.valid_until:
+#                 product.discounted_price = discount.discounted_price()
+#                 product.discount_percent = discount.percent
+#             else:
+#                 product.discounted_price = None
+#                 product.discount_percent = 0
+#         except:
+#             product.discounted_price = None
+#             product.discount_percent = 0
 
-    context = {
-        'categories': Category.objects.all(),
-        'shops': Shop.objects.all(),
-        'products': products,
-        'offers': Offer.objects.all(),
-        'cart_items': cart_view(request)[0],
-        'total': cart_view(request)[1],
-        'all_products_count': cart_view(request)[2]
-    }
-    return render(request, 'index.html', context)
+#     context = {
+#         'categories': Category.objects.all(),
+#         'shops': Shop.objects.all(),
+#         'products': products,
+#         'offers': Offer.objects.all(),
+#         'cart_items': cart_view(request)[0],
+#         'total': cart_view(request)[1],
+#         'all_products_count': cart_view(request)[2]
+#     }
+#     return render(request, 'index.html', context)
 
 
 def itest(request):
