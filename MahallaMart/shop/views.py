@@ -56,7 +56,20 @@ def search_api(request):
 
     if query:
         products_queryset = Product.objects.filter(name__icontains=query)[:10]
-        products = [{'id': p.id, 'image_url':p.image_url, 'name': p.name, 'price': p.price} for p in products_queryset]
+        today = date.today()
+        for product in products_queryset:
+            try:
+                discount = product.discount
+                if discount.valid_from <= today <= discount.valid_until:
+                    product.discounted_price = discount.discounted_price()
+                    product.discount_percent = discount.percent
+                else:
+                    product.discounted_price = None
+                    product.discount_percent = 0
+            except:
+                product.discounted_price = None
+                product.discount_percent = 0
+        products = [{'id': p.id, 'image_url':p.image_url, 'name': p.name, 'price': p.price, 'discounted_price':p.discounted_price,} for p in products_queryset]
 
     return JsonResponse({'products': products})
 

@@ -168,43 +168,38 @@
   </div>
 
   <!-- 🛒 Best Selling Products -->
-<h5 class="section-title">Eng Ko'p Sotilayotgan Mahsulotlar</h5>
+<h5 class="section-title">Chegirmadagi Mahsulotlar</h5>
 
 <div class="scroll-wrapper overflow-auto">
   <div class="d-flex flex-nowrap gap-3 py-2">
     {% for product in products %}
-      <div class="product-card-wrapper flex-shrink-0" style="width: 200px;">
-        <article class="product-card h-100" role="button" tabindex="0">
-          <div class="position-relative">
-            <img src="{{ product.image_url }}" loading="lazy" class="product-img w-100" alt="Mahsulot rasmi">
-            {% if product.discounted_price %}<div class="discount-badge">-{{ product.discount_percent }}% chegirmada</div>{% endif %}
-          </div>
-          <div class="p-2">
-            <h6 class="mb-1">{{ product.name }}</h6>
-            <p class="small text-muted mb-1">{{ product.category }} | {{ product.shop }}</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
+      {% if product.discounted_price %}
+        <div class="product-card-wrapper flex-shrink-0" style="width: 200px;">
+          <article class="product-card h-100" role="button" tabindex="0">
+            <div class="position-relative">
+              <img src="{{ product.image_url }}" loading="lazy" class="product-img w-100" alt="Mahsulot rasmi">
+              <div class="discount-badge">-{{ product.discount_percent }}% chegirmada</div>
+            </div>
+            <div class="p-2">
+              <h6 class="mb-1">{{ product.name }}</h6>
+              <p class="small text-muted mb-1">{{ product.category }} | {{ product.shop }}</p>
+              <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  {% if product.discounted_price %}
-                    <span class="fw-bold text-danger">{{ product.discounted_price|floatformat:0 }} SO'M</span><br>
-                    <span class="small text-muted text-decoration-line-through">{{ product.price|floatformat:0 }} SO'M</span>
-                  {% else %}
-                    <span class="fw-bold">{{ product.price|floatformat:0 }} SO'M</span>
-                  {% endif %}
+                  <span class="fw-bold text-danger">{{ product.discounted_price|floatformat:0 }} SO'M</span><br>
+                  <span class="small text-muted text-decoration-line-through">{{ product.price|floatformat:0 }} SO'M</span>
                   <div class="delivery-time">30 daqiqa</div>
                 </div>
+                <button class="btn btn-sm btn-primary rounded-pill add-btn add-to-cart-btn" data-id="{{ product.id }}">
+                  <i class="bi bi-cart-plus me-1"></i>
+                </button>
               </div>
-              <button class="btn btn-sm btn-primary rounded-pill add-btn add-to-cart-btn" data-id="{{ product.id }}">
-                <i class="bi bi-cart-plus me-1"></i>
-              </button>
             </div>
-          </div>
-        </article>
-      </div>
+          </article>
+        </div>
+      {% endif %}
     {% endfor %}
   </div>
 </div>
-
 
   <!-- 🏪 Shops -->
   <h5 class="section-title mb-4">Biz Bilan Birga</h5>
@@ -308,8 +303,9 @@
                   <div class="d-flex align-items-center gap-3">
                     <img src="${product.image_url}" alt="${product.name}" class="rounded-3" style="width: 60px; height: 60px; object-fit: cover;">
                     <div class="d-flex flex-column">
-                      <span class="fw-medium text-dark">${product.name}</span>
-                      <small class="text-muted">${product.price} so'm</small>
+                        <span class="fw-medium text-dark">${product.name}</span>
+                        ${product.discounted_price ? `<span class="text-danger fw-bold">${product.discounted_price} so'm</span>` : ''}
+                        <span class="text-muted ${product.discounted_price ? 'text-decoration-line-through' : ''}">${product.price} so'm</span>
                     </div>
                   </div>
                   <button class="btn btn-sm btn-primary rounded-pill add-btn add-to-cart-btn" data-id="${product.id}">

@@ -327,7 +327,8 @@ function getLocation() {
     };
   
   if (!address) {
-    alert('Iltimos manzilni kiriting!');
+    alert('Iltimos, yetkazib berish manzilini kiriting!');
+    document.getElementById('address').focus();
     return;
   }
   if (!fullName) {
