@@ -187,7 +187,7 @@ def complete_order(request):
             f"🛒 *Mahsulotlar soni:* {products_count}\n"
             f"📋 *Mahsulotlar:*\n{products}\n\n"
             f"\n\n💰 *Jami:* {finish_total} SO'M\n"
-            f"📍 *Manzil:* {address}\n"
+            f"📍 *Manzil:* `{address}`\n"
             f"🎁 *Promokod:* {promo_code}\n"
             f"💳 *To'lov:* {payment_method}"
         )
